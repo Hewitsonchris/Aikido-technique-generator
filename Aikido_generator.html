@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Aikido Technique Generator</title>
+  <style>
+    /* CSS styles for the elements */
+
+    /* Technique Log styles */
+    #techniqueLog {
+      float: left;
+      margin-right: 20px;
+    }
+
+    /* Heatmap styles */
+    #heatmapContainer {
+      float: left;
+    }
+
+    #heatmapTable {
+      border-collapse: collapse;
+    }
+
+    #heatmapTable th,
+    #heatmapTable td {
+      padding: 8px;
+      text-align: center;
+      border: 1px solid #ddd;
+    }
+
+    #heatmapTable th {
+      background-color: #f2f2f2;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <h1>Aikido Technique Generator</h1>
+
+  <div>
+    <h2>Technique Generator</h2>
+    <div>
+      <select id="stanceSelect">
+        <!-- Options for stance -->
+      </select>
+      <select id="attackSelect">
+        <!-- Options for attack -->
+      </select>
+      <select id="techniqueSelect">
+        <!-- Options for technique -->
+      </select>
+      <button onclick="selectTechnique()">Select</button>
+      <button onclick="generateTechnique()">Generate Technique</button>
+      <input type="checkbox" id="repeatCheckbox" checked>
+      <label for="repeatCheckbox">Repeat</label>
+    </div>
+    <div>
+      <p id="generatedTechnique"></p>
+    </div>
+  </div>
+
+  <div id="techniqueLog">
+    <h2>Technique Log</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Stance</th>
+          <th>Attack</th>
+          <th>Technique</th>
+          <th>Count</th>
+          <th>Date</th>
+        </tr>
+      </thead>
+      <tbody>
+        <!-- Technique log rows will be dynamically added here -->
+      </tbody>
+    </table>
+  </div>
+
+  <div id="heatmapContainer">
+    <h2>Technique Heatmap</h2>
+    <table id="heatmapTable">
+      <thead>
+        <tr>
+          <th></th>
+          <!-- Attack headers will be dynamically added here -->
+        </tr>
+      </thead>
+      <tbody>
+        <!-- Heatmap rows will be dynamically added here -->
+      </tbody>
+    </table>
+  </div>
+
+  <script>
+    // Array of stances, attacks, techniques
+    var stances = ["Suwari-waza", "Hanmi-Handachi", "Tachi-waza"];
+    var attacks = [
+      "Aihanmi-Katate-dori",
+      "Gyakuhanmi-Katate-dori",
+      "Kata-Menuchi",
+      "Kata-dori",
+      "Morote-dori",
+      "Shomen-uchi",
+      "Tsuki",
+      "Ushiro-Ryote-dori",
+      "Ushiro-eri-dori",
+      "Yokomen-uchi"
+    ];
+    var techniques = [
+      "Ikkyo",
+      "Nikyo",
+      "Sankyo",
+      "Yonkyo",
+      "Gokyo",
+      "Shihonage",
+      "Rokyo",
+      "Aiki-otoshi",
+      "Iriminage",
+      "Kaiten-nage",
+      "Kotegaeshi",
+      "Kokyunage",
+      "Koshi-nage",
+      "Juji-garami",
+      "Juji-nage",
+      "Sumi-otoshi"
+    ];
+
+    // Technique log array
+    var techniqueLog = [];
+
+    // Populate select options
+    function populateSelectOptions(selectId, options) {
+      var select = document.getElementById(selectId);
+      select.innerHTML = "";
+
+      options.forEach(function (option) {
+        var optionElement = document.createElement("option");
+        optionElement.text = option;
+        select.add(optionElement);
+      });
+    }
+
+    // Populate select options initially
+    populateSelectOptions("stanceSelect", stances);
+    populateSelectOptions("attackSelect", attacks);
+    populateSelectOptions("techniqueSelect", techniques);
+
+    // Generate a random technique
+    function generateTechnique() {
+      var randomStance = stances[Math.floor(Math.random() * stances.length)];
+      var randomAttack = attacks[Math.floor(Math.random() * attacks.length)];
+      var randomTechnique = techniques[Math.floor(Math.random() * techniques.length)];
+
+      var generatedTechnique = randomStance + ", " + randomAttack + " - " + randomTechnique;
+      document.getElementById("generatedTechnique").textContent = generatedTechnique + " - Omote and Ura Waza";
+
+      // Log the generated technique
+      logTechnique(randomStance, randomAttack, randomTechnique);
+
+      displayTechniqueLog();
+      updateHeatmap();
+    }
+
+    // Select technique manually
+    function selectTechnique() {
+      var selectedStance = document.getElementById("stanceSelect").value;
+      var selectedAttack = document.getElementById("attackSelect").value;
+      var selectedTechnique = document.getElementById("techniqueSelect").value;
+
+      var generatedTechnique = selectedStance + ", " + selectedAttack + " - " + selectedTechnique;
+      document.getElementById("generatedTechnique").textContent = generatedTechnique + " - Omote and Ura Waza";
+
+      // Log the selected technique
+      logTechnique(selectedStance, selectedAttack, selectedTechnique);
+
+      displayTechniqueLog();
+      updateHeatmap();
+    }
+
+    // Log a technique
+    function logTechnique(selectedStance, selectedAttack, selectedTechnique) {
+      var existingLog = techniqueLog.find(function (log) {
+        return log.stance === selectedStance && log.attack === selectedAttack && log.technique === selectedTechnique;
+      });
+
+      if (existingLog) {
+        existingLog.count++;
+      } else {
+        techniqueLog.push({
+          stance: selectedStance,
+          attack: selectedAttack,
+          technique: selectedTechnique,
+          date: new Date().toLocaleDateString(),
+          count: 1
+        });
+      }
+    }
+
+    // Get the count of a technique in the log
+    function getTechniqueCount(selectedAttack, selectedTechnique) {
+      var logEntry = techniqueLog.find(function (log) {
+        return log.attack === selectedAttack && log.technique === selectedTechnique;
+      });
+
+      return logEntry ? logEntry.count : 0;
+    }
+
+    // Display the technique log in the table
+    function displayTechniqueLog() {
+      var tableBody = document.getElementById("techniqueLog").querySelector("tbody");
+      tableBody.innerHTML = "";
+
+      techniqueLog.forEach(function (log) {
+        var row = document.createElement("tr");
+
+        var stanceCell = document.createElement("td");
+        stanceCell.textContent = log.stance;
+        row.appendChild(stanceCell);
+
+        var attackCell = document.createElement("td");
+        attackCell.textContent = log.attack;
+        row.appendChild(attackCell);
+
+        var techniqueCell = document.createElement("td");
+        techniqueCell.textContent = log.technique;
+        row.appendChild(techniqueCell);
+
+        var countCell = document.createElement("td");
+        countCell.textContent = log.count;
+        row.appendChild(countCell);
+
+        var dateCell = document.createElement("td");
+        dateCell.textContent = log.date;
+        row.appendChild(dateCell);
+
+        tableBody.appendChild(row);
+      });
+    }
+
+    // Update the heatmap table
+    function updateHeatmap() {
+      var heatmapTable = document.getElementById("heatmapTable");
+      var tableBody = heatmapTable.querySelector("tbody");
+      var tableHeader = heatmapTable.querySelector("thead tr");
+
+      // Remove existing technique columns
+      while (tableHeader.cells.length > 1) {
+        tableHeader.deleteCell(-1);
+        tableBody.querySelectorAll("tr").forEach(function (row) {
+          row.deleteCell(-1);
+        });
+      }
+
+      // Add technique columns
+      techniques.forEach(function (technique) {
+        var headerCell = document.createElement("th");
+        headerCell.textContent = technique;
+        tableHeader.appendChild(headerCell);
+
+        attacks.forEach(function (attack) {
+          var row = tableBody.querySelector('tr[data-attack="' + attack + '"]');
+          if (!row) {
+            row = document.createElement("tr");
+            row.setAttribute("data-attack", attack);
+            tableBody.appendChild(row);
+
+            var attackCell = document.createElement("td");
+            attackCell.textContent = attack;
+            row.appendChild(attackCell);
+          }
+
+          var countCell = document.createElement("td");
+          var count = getTechniqueCount(attack, technique);
+          countCell.textContent = count;
+          row.appendChild(countCell);
+
+          // Apply color coding to cells based on counts
+          countCell.style.backgroundColor = getColorCode(count);
+        });
+      });
+    }
+
+    // Get color code based on count
+    function getColorCode(count) {
+      var color = "";
+
+      if (count >= 10) {
+        color = "#ff0000"; // Red
+      } else if (count >= 5) {
+        color = "#ffa500"; // Orange
+      } else if (count >= 3) {
+        color = "#ffff00"; // Yellow
+      } else if (count >= 1) {
+        color = "#00ff00"; // Green
+      }
+
+      return color;
+    }
+
+    // Initial display of technique log and heatmap
+    displayTechniqueLog();
+    updateHeatmap();
+  </script>
+</body>
+</html>
