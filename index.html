@@ -58,6 +58,14 @@
     </div>
   </div>
 
+  <!-- Add the "Toggle Technique Log" and "Toggle Technique Heatmap" buttons here -->
+  <div>
+    <h2>Toggle Visibility</h2>
+    <button onclick="toggleTechniqueLog()">Toggle Technique Log</button>
+    <button onclick="toggleTechniqueHeatmap()">Toggle Technique Heatmap</button>
+  </div>
+
+
   <div id="techniqueLog">
     <h2>Technique Log</h2>
     <table>
@@ -94,6 +102,8 @@
       </tbody>
     </table>
   </div>
+
+  
 
   <script>
     // Array of stances, attacks, techniques
@@ -299,6 +309,18 @@
       }
 
       return color;
+    }
+
+    // Function to toggle the visibility of the technique log
+    function toggleTechniqueLog() {
+      var techniqueLogDiv = document.getElementById("techniqueLog");
+      techniqueLogDiv.style.display = techniqueLogDiv.style.display === "none" ? "block" : "none";
+    }
+
+    // Function to toggle the visibility of the technique heatmap
+    function toggleTechniqueHeatmap() {
+      var heatmapContainerDiv = document.getElementById("heatmapContainer");
+      heatmapContainerDiv.style.display = heatmapContainerDiv.style.display === "none" ? "block" : "none";
     }
 
     // Function to save the technique log as a CSV file
