@@ -74,6 +74,10 @@
         <!-- Technique log rows will be dynamically added here -->
       </tbody>
     </table>
+    <div>
+      <!-- Add the "Save Log" button here -->
+      <button onclick="saveTechniqueLog()">Save Log as CSV</button>
+    </div>
   </div>
 
   <div id="heatmapContainer">
@@ -295,6 +299,45 @@
       }
 
       return color;
+    }
+
+    // Function to save the technique log as a CSV file
+    function saveTechniqueLog() {
+      // Create a CSV content string
+      var csvContent = "Stance,Attack,Technique,Count,Date\n";
+      techniqueLog.forEach(function (log) {
+        csvContent +=
+          '"' +
+          log.stance +
+          '","' +
+          log.attack +
+          '","' +
+          log.technique +
+          '",' +
+          log.count +
+          ',"' +
+          log.date +
+          '"\n';
+      });
+
+      // Create a Blob containing the CSV data
+      var blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+
+      // Create a temporary anchor element to trigger the download
+      var link = document.createElement("a");
+      if (link.download !== undefined) {
+        // Browsers that support HTML5 download attribute
+        var url = URL.createObjectURL(blob);
+        link.setAttribute("href", url);
+        link.setAttribute("download", "technique_log.csv");
+        link.style.visibility = "hidden";
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+      } else {
+        // Handle browsers that do not support HTML5 download attribute
+        alert("Your browser does not support downloading files.");
+      }
     }
 
     // Initial display of technique log and heatmap
