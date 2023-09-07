@@ -1,5 +1,4 @@
-<!-- Aikido Technique genetor: Created by Chris Hewitson on 29/08/2023, all rights reserved -->
-
+<!-- Aikido Technique Generator: Created by Chris Hewitson on 29/08/2023, all rights reserved -->
 
 <!DOCTYPE html>
 <html>
@@ -53,6 +52,10 @@
       </select>
       <button onclick="selectTechnique()">Select</button>
       <button onclick="generateTechnique()">Generate Technique</button>
+      
+      <!-- Add the "Log" button here -->
+      <button onclick="logTechnique()">Log</button>
+      
       <input type="checkbox" id="repeatCheckbox" checked>
       <label for="repeatCheckbox">Repeat</label>
     </div>
@@ -61,13 +64,18 @@
     </div>
   </div>
 
+  <!-- Add the "YouTube Search" header and dynamic link here -->
+  <div id="youtubeSearchContainer">
+    <h2>YouTube Search</h2>
+    <p><a id="youtubeSearchLink" target="_blank" href="#">Search on YouTube</a></p>
+  </div>
+
   <!-- Add the "Toggle Technique Log" and "Toggle Technique Heatmap" buttons here -->
   <div>
     <h2>Toggle Visibility</h2>
     <button onclick="toggleTechniqueLog()">Toggle Technique Log</button>
     <button onclick="toggleTechniqueHeatmap()">Toggle Technique Heatmap</button>
   </div>
-
 
   <div id="techniqueLog">
     <h2>Technique Log</h2>
@@ -79,6 +87,7 @@
           <th>Technique</th>
           <th>Count</th>
           <th>Date</th>
+          <th>YouTube Search</th>
         </tr>
       </thead>
       <tbody>
@@ -106,22 +115,20 @@
     </table>
   </div>
 
-  
-
   <script>
     // Array of stances, attacks, techniques
-    var stances = ["Suwari-waza", "Hanmi-Handachi", "Tachi-waza"];
+    var stances = ["Suwari waza", "Hanmi Handachi", "Tachi waza"];
     var attacks = [
-      "Aihanmi-Katate-dori",
-      "Gyakuhanmi-Katate-dori",
-      "Kata-Menuchi",
-      "Kata-dori",
-      "Morote-dori",
-      "Shomen-uchi",
+      "Aihanmi Katate dori",
+      "Gyakuhanmi Katate dori",
+      "Katamenuchi",
+      "Kata dori",
+      "Morote dori",
+      "Shomenuchi",
       "Tsuki",
-      "Ushiro-Ryote-dori",
-      "Ushiro-eri-dori",
-      "Yokomen-uchi"
+      "Ushiro Ryote dori",
+      "Ushiro Eri dori",
+      "Yokomenuchi"
     ];
     var techniques = [
       "Ikkyo",
@@ -129,21 +136,40 @@
       "Sankyo",
       "Yonkyo",
       "Gokyo",
-      "Shihonage",
+      "Shiho nage",
       "Rokyo",
-      "Aiki-otoshi",
-      "Iriminage",
-      "Kaiten-nage",
-      "Kotegaeshi",
-      "Kokyunage",
-      "Koshi-nage",
-      "Juji-garami",
-      "Juji-nage",
-      "Sumi-otoshi"
+      "Aiki otoshi",
+      "Irimi nage",
+      "Uchi Kaiten nage",
+      "Soto Kaiten nage",
+      "Kote gaeshi",
+      "Kokyu ho",
+      "Kokyu nage",
+      "Koshi nage",
+      "Juji garami",
+      "Juji nage",
+      "Sumi otoshi"
     ];
 
     // Technique log array
     var techniqueLog = [];
+
+    // Store the current technique
+    var currentStance = "";
+    var currentAttack = "";
+    var currentTechnique = "";
+
+    // Function to toggle the visibility of the technique log
+    function toggleTechniqueLog() {
+      var techniqueLogDiv = document.getElementById("techniqueLog");
+      techniqueLogDiv.style.display = techniqueLogDiv.style.display === "none" ? "block" : "none";
+    }
+
+    // Function to toggle the visibility of the technique heatmap
+    function toggleTechniqueHeatmap() {
+      var heatmapContainerDiv = document.getElementById("heatmapContainer");
+      heatmapContainerDiv.style.display = heatmapContainerDiv.style.display === "none" ? "block" : "none";
+    }
 
     // Populate select options
     function populateSelectOptions(selectId, options) {
@@ -168,11 +194,16 @@
       var randomAttack = attacks[Math.floor(Math.random() * attacks.length)];
       var randomTechnique = techniques[Math.floor(Math.random() * techniques.length)];
 
-      var generatedTechnique = randomStance + ", " + randomAttack + " - " + randomTechnique;
+      // Store the current technique
+      currentStance = randomStance;
+      currentAttack = randomAttack;
+      currentTechnique = randomTechnique;
+
+      var generatedTechnique = randomStance + " " + randomAttack + " " + randomTechnique;
       document.getElementById("generatedTechnique").textContent = generatedTechnique + " - Omote and Ura Waza";
 
-      // Log the generated technique
-      logTechnique(randomStance, randomAttack, randomTechnique);
+      // Update the YouTube search link
+      updateYouTubeSearchLink();
 
       displayTechniqueLog();
       updateHeatmap();
@@ -184,32 +215,50 @@
       var selectedAttack = document.getElementById("attackSelect").value;
       var selectedTechnique = document.getElementById("techniqueSelect").value;
 
-      var generatedTechnique = selectedStance + ", " + selectedAttack + " - " + selectedTechnique;
+      // Store the current technique
+      currentStance = selectedStance;
+      currentAttack = selectedAttack;
+      currentTechnique = selectedTechnique;
+
+      var generatedTechnique = selectedStance + " " + selectedAttack + " " + selectedTechnique;
       document.getElementById("generatedTechnique").textContent = generatedTechnique + " - Omote and Ura Waza";
 
-      // Log the selected technique
-      logTechnique(selectedStance, selectedAttack, selectedTechnique);
+      // Update the YouTube search link
+      updateYouTubeSearchLink();
 
       displayTechniqueLog();
       updateHeatmap();
     }
 
-    // Log a technique
-    function logTechnique(selectedStance, selectedAttack, selectedTechnique) {
-      var existingLog = techniqueLog.find(function (log) {
-        return log.stance === selectedStance && log.attack === selectedAttack && log.technique === selectedTechnique;
-      });
+    // Update the YouTube search link
+    function updateYouTubeSearchLink() {
+      var youtubeSearchLink = document.getElementById("youtubeSearchLink");
+      var formattedTechnique = (currentStance + " " + currentAttack + " " + currentTechnique).replace(/ /g, "+");
+      youtubeSearchLink.href = "https://www.youtube.com/results?search_query=" + formattedTechnique;
+    }
 
-      if (existingLog) {
-        existingLog.count++;
-      } else {
-        techniqueLog.push({
-          stance: selectedStance,
-          attack: selectedAttack,
-          technique: selectedTechnique,
-          date: new Date().toLocaleDateString(),
-          count: 1
+    // Log a technique
+    function logTechnique() {
+      // Check if a technique is selected/generated before logging
+      if (currentStance && currentAttack && currentTechnique) {
+        var existingLog = techniqueLog.find(function (log) {
+          return log.stance === currentStance && log.attack === currentAttack && log.technique === currentTechnique;
         });
+
+        if (existingLog) {
+          existingLog.count++;
+        } else {
+          techniqueLog.push({
+            stance: currentStance,
+            attack: currentAttack,
+            technique: currentTechnique,
+            date: new Date().toLocaleDateString(),
+            count: 1
+          });
+        }
+
+        displayTechniqueLog();
+        updateHeatmap();
       }
     }
 
@@ -249,6 +298,14 @@
         var dateCell = document.createElement("td");
         dateCell.textContent = log.date;
         row.appendChild(dateCell);
+
+        var youtubeSearchCell = document.createElement("td");
+        // Create a YouTube search link for the current log entry
+        var youtubeSearchLink = document.createElement("a");
+        youtubeSearchLink.href = "https://www.youtube.com/results?search_query=" + log.stance + " " + log.attack + " " + log.technique;
+        youtubeSearchLink.textContent = "Search on YouTube";
+        youtubeSearchCell.appendChild(youtubeSearchLink);
+        row.appendChild(youtubeSearchCell);
 
         tableBody.appendChild(row);
       });
@@ -312,18 +369,6 @@
       }
 
       return color;
-    }
-
-    // Function to toggle the visibility of the technique log
-    function toggleTechniqueLog() {
-      var techniqueLogDiv = document.getElementById("techniqueLog");
-      techniqueLogDiv.style.display = techniqueLogDiv.style.display === "none" ? "block" : "none";
-    }
-
-    // Function to toggle the visibility of the technique heatmap
-    function toggleTechniqueHeatmap() {
-      var heatmapContainerDiv = document.getElementById("heatmapContainer");
-      heatmapContainerDiv.style.display = heatmapContainerDiv.style.display === "none" ? "block" : "none";
     }
 
     // Function to save the technique log as a CSV file
